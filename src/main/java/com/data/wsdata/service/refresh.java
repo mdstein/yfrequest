@@ -21,7 +21,7 @@ public class refresh {
 
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    private static final Duration refreshRate = Duration.ofSeconds(15);
+    private static final Duration refreshRate = Duration.ofSeconds(5);
 
 
     public refresh() {
@@ -41,11 +41,11 @@ public class refresh {
         scheduler.scheduleAtFixedRate(() ->
             stocksToRefresh.forEach((stock, value) -> {
                 if (stock.getLastTime().isBefore(LocalDateTime.now().minus(refreshRate))) {
-                    System.out.println("Setting should refresh " + stock.getStock().getSymbol());
+                    System.out.println("refreshing " + stock.getStock().getSymbol() + "...");
                     stocksToRefresh.remove(stock);
                     stocksToRefresh.put(stock.withLastTime(LocalDateTime.now()), true);
                 }
-            }), 0, 15, SECONDS);
+            }), 0, 5, SECONDS);
         }
     }
 

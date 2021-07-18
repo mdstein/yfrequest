@@ -44,10 +44,12 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
         return stock;
     }
 
+    // get single stock price
     void stockPrice(String stockname) throws IOException {
         System.out.println(service.findPrice(getStockWrapper(stockname)));
     }
 
+    // get list of stock prices
     void stockPrices(List<wrapper> stocks) {
         stocks.forEach(stock -> {
             System.out.println();
@@ -59,6 +61,10 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
                 System.out.println("FAILED TO FIND STOCKS LIST!");
             }
         });
+    }
+
+    BigDecimal change200D(wrapper stock) throws IOException {
+        return service.findChange200DMeanPerc(stock);
     }
 
     private String lastLine = "";
@@ -97,27 +103,66 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
         anim++;
     }
 
+    private final String menu = "(1) check stock information\n" +
+            "(2) import stock list\n(3) exit";
     @Override
     public void run(String... args) throws Exception {
         Scanner input = new Scanner(System.in);
+        boolean loop = true;
         System.out.print("\n\n");
-        System.out.println("Enter file name: ");
-        String fileName = input.nextLine();
-        if (fileName != null) {
-            System.out.println("\n\nfile read. continuing...");
-            System.out.print("\n\n");
-        }
-        List<wrapper> a = read(fileName);
-        CommandLineAppStartupRunner clr = new CommandLineAppStartupRunner();
-        System.out.print("\n\n");
-        for (int i = 0; i < a.size(); i++) {
-            clr.animate("Lines read: " + (i + 1));
-            Thread.sleep(200);
-        }
-        System.out.println();
-        System.out.println();
-        System.out.printf("successfully read file '%s'\n", fileName);
-        Thread.sleep(400);
+        do {
+            System.out.println(menu);
+            int choice = input.nextInt();
+            input.nextLine();
+            if (choice > 3 || choice < 0) {
+                System.out.println("invalid selection");
+                continue;
+            }
+            switch(choice) {
+                case 1: // single stock information
+                    System.out.println("enter ticker: ");
+                    String stock = input.nextLine();
+                    stockPrice(stock);
+                    Thread.sleep(400);
+                    System.out.println("continue? y/n");
+                    if (input.next().equalsIgnoreCase("y")) {
+                        continue;
+                    } else {
+                        System.exit(0);
+                    }
+                    break;
+                case 2: // file import
+                    System.out.println("Enter file name: ");
+                    String fileName = input.nextLine();
+                    if (fileName != null) {
+                        System.out.println("\n\nfile read. continuing...");
+                        System.out.print("\n\n");
+                    }
+                    List<wrapper> a = read(fileName);
+                    CommandLineAppStartupRunner clr = new CommandLineAppStartupRunner();
+                    System.out.print("\n\n");
+                    for (int i = 0; i < a.size(); i++) {
+                        clr.animate("Lines read: " + (i + 1));
+                        Thread.sleep(200);
+                    }
+                    System.out.println();
+                    System.out.println();
+                    System.out.printf("successfully read file '%s'\n", fileName);
+                    Thread.sleep(400);
+
+                    stockPrices(a);
+                    System.out.printf("%s moving perc. change (200D): ", a.get(3).getStock().getSymbol());
+                    System.out.print(change200D(a.get(3)) + "%\n");
+                    System.out.println("\n");
+                    loop = false;
+                    break;
+                case 3: // exit
+                    System.out.println("Exiting...");
+                    System.exit(0);
+            }
+        } while (loop);
+
+
         System.out.print("                                                      \n" +
                 "                                                      \n" +
                 " /$$$$$$/$$$$   /$$$$$$  /$$   /$$  /$$$$$$  /$$$$$$$ \n" +
@@ -129,8 +174,8 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
                 "                                                      \n" +
                 "                                                      \n" +
                 "                                                      ");
+        System.out.println();
 
-        // do shit below this
-        stockPrices(a);
+
     }
 }
