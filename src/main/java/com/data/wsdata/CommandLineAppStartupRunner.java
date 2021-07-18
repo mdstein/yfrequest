@@ -50,25 +50,87 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
     void stockPrices(List<wrapper> stocks) {
         stocks.forEach(stock -> {
-            System.out.println(stock.getStock().getSymbol());
-            /*try {
+            System.out.println();
+            try {
                 System.out.println(stock.getStock().getSymbol());
-                //System.out.print(" : " + service.findPrice(stock));
+                System.out.println("\ncurrent price: " + service.findPrice(stock) + "\n");
+                System.out.println("_____________________________________\n");
             } catch (IOException e) {
                 System.out.println("FAILED TO FIND STOCKS LIST!");
-            }*/
+            }
         });
+    }
+
+    private String lastLine = "";
+
+    public void print(String line) {
+        //clear the last line if longer
+        if (lastLine.length() > line.length()) {
+            String temp = "";
+            for (int i = 0; i < lastLine.length(); i++) {
+                temp += " ";
+            }
+            if (temp.length() > 1)
+                System.out.print("\r" + temp);
+        }
+        System.out.print("\r" + line);
+        lastLine = line;
+    }
+
+    private byte anim;
+
+    void animate(String line) {
+        switch (anim) {
+            case 1:
+                print("[ -> ] " + line);
+                break;
+            case 2:
+                print("[ --> ] " + line);
+                break;
+            case 3:
+                print("[ ---> ] " + line);
+                break;
+            default:
+                anim = 0;
+                print("[ > ] " + line);
+        }
+        anim++;
     }
 
     @Override
     public void run(String... args) throws Exception {
         Scanner input = new Scanner(System.in);
+        System.out.print("\n\n");
         System.out.println("Enter file name: ");
         String fileName = input.nextLine();
         if (fileName != null) {
-            System.out.println("file read. continuing...");
+            System.out.println("\n\nfile read. continuing...");
+            System.out.print("\n\n");
         }
+        List<wrapper> a = read(fileName);
+        CommandLineAppStartupRunner clr = new CommandLineAppStartupRunner();
+        System.out.print("\n\n");
+        for (int i = 0; i < a.size(); i++) {
+            clr.animate("Lines read: " + (i + 1));
+            Thread.sleep(200);
+        }
+        System.out.println();
+        System.out.println();
+        System.out.printf("successfully read file '%s'\n", fileName);
+        Thread.sleep(400);
+        System.out.print("                                                      \n" +
+                "                                                      \n" +
+                " /$$$$$$/$$$$   /$$$$$$  /$$   /$$  /$$$$$$  /$$$$$$$ \n" +
+                "| $$_  $$_  $$ |____  $$|  $$ /$$/ /$$__  $$| $$__  $$\n" +
+                "| $$ \\ $$ \\ $$  /$$$$$$$ \\  $$$$/ | $$  \\ $$| $$  \\ $$\n" +
+                "| $$ | $$ | $$ /$$__  $$  >$$  $$ | $$  | $$| $$  | $$\n" +
+                "| $$ | $$ | $$|  $$$$$$$ /$$/\\  $$|  $$$$$$/| $$  | $$\n" +
+                "|__/ |__/ |__/ \\_______/|__/  \\__/ \\______/ |__/  |__/\n" +
+                "                                                      \n" +
+                "                                                      \n" +
+                "                                                      ");
 
-        stockPrices(read(fileName));
+        // do shit below this
+        stockPrices(a);
     }
 }
