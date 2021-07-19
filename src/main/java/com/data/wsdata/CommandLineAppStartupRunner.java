@@ -49,6 +49,19 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
         System.out.println(service.findPrice(getStockWrapper(stockname)));
     }
 
+    void printOneYearHistory(wrapper stock) throws IOException {
+        System.out.println(service.oneYearHist(stock));
+    }
+
+    void entityFullDetail(wrapper stock) throws IOException {
+        service.findPrice(stock);
+        service.findChange200DMeanPerc(stock);
+    }
+
+    void divOutput(wrapper stock) {
+        System.out.println(service.lastDividend(stock));
+    }
+
     // get list of stock prices
     void stockPrices(List<wrapper> stocks) {
         stocks.forEach(stock -> {
@@ -65,6 +78,10 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
     BigDecimal change200D(wrapper stock) throws IOException {
         return service.findChange200DMeanPerc(stock);
+    }
+
+    void printStats(wrapper stock) {
+        System.out.println(service.test(stock));
     }
 
     private String lastLine = "";
@@ -122,7 +139,9 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
                 case 1: // single stock information
                     System.out.println("enter ticker: ");
                     String stock = input.nextLine();
-                    stockPrice(stock);
+                    printStats(getStockWrapper(stock));
+
+                   // stockPrice(stock);
                     Thread.sleep(400);
                     System.out.println("continue? y/n");
                     if (input.next().equalsIgnoreCase("y")) {

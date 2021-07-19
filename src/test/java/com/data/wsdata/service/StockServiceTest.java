@@ -4,6 +4,7 @@ import com.data.wsdata.model.wrapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import yahoofinance.histquotes.HistoricalQuote;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -29,6 +30,10 @@ class StockServiceTest {
 
         final BigDecimal change200D = stockService.findChange200DMeanPerc(stock);
         System.out.println(change200D);
+
+        System.out.println("----------- HISTORY -------------");
+        final List<HistoricalQuote> history = stockService.oneYearHist(stock);
+        System.out.println(history);
     }
 
 
